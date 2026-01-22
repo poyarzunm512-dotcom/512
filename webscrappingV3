@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+# ya se hizo esto antes sudo gem install nokogiri
+# despues sudo gem install httparty
+require "nokogiri"
+require "httparty"
+
+def scrapper
+#pide la URL al jaquer
+puts ":::WEB SCRAPPER DE LINKS:::"
+puts "Ingresa la URL que quieres escrapearle los links"
+url=gets.chomp
+#verifica si es http o https
+unless url.start_with?("http://", "https://")
+url="https://#{url}"
+puts "Se agregó https:// a la URL: #{url}"
+end
+puts ""
+puts "Obteniendo información de #{url}..."
+puts ""
+
+unparsed_page = HTTParty.get(url)
+parsed_page = Nokogiri::HTML(unparsed_page.body)
+
+#Lista todos los enlaces
+links = parsed_page.css ("a")
+puts "::::::ENLACES ENCONTRADOS EN LA PAGINA EN CUESTION::::::"
+puts "Total: #{links.count} enlaces"
+puts ""
+links.each_with_index do |link, index|
+texto=link.text.strip
+href=link["href"]
+
+# Solo muestra si tiene texto
+if texto.length > 0
+puts "#{index + 1}. #{texto}"
+puts "   URL: #{href}"
+puts ""
+end
+end
+end
+
+scrapper
+#esta uea es asombrosa devuelve todo el codigo fuente del sitio
